@@ -1,0 +1,24 @@
+import cv2 as cv
+from deepface import DeepFace
+import numpy as np
+face_cascade_name = cv.data.haarcascades + 'haarcascade_frontalface_alt.xml' 
+face_cascade = cv.CascadeClassifier() 
+if not face_cascade.load(cv.samples.findFile(face_cascade_name)):  
+    print("Error loading xml file")
+video=cv.VideoCapture(0)  #requisting the input from the webcam or camera
+while video.isOpened():  #checking if are getting video feed and using it
+    _,frame = video.read()
+    gray=cv.cvtColor(frame,cv.COLOR_BGR2GRAY)  
+    face=face_cascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=5)
+    for x,y,w,h in face:
+      img=cv.circle(frame,(x,y),(x+w,y+h),(0,0,200),1) 
+    try:
+        analyze = DeepFace.analyze(frame,actions=['emotions'])  
+        print(analyze['dominant_emotion'])
+    except:
+        print("Face Not found")
+    cv.imshow('video', frame)
+    key=cv.waitKey(0) 
+    if key==ord('q'):  
+        break
+    video.release()
